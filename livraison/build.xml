@@ -1,0 +1,115 @@
+<!-- Auteur: Boutrois Benjamin -->
+<project name="Analyseur" default="build" basedir=".">
+    <!-- Propriétés -->
+    <property name="src.dir" location="src" />
+    <property name="test.dir" location="tests" />
+    <property name="build.dir" location="build" />
+    <property name="dist.dir" location="dist" />
+    <property name="doc.dir" location="doc" />
+
+    <!-- Nettoyage -->
+    <target name="clean" description="Nettoie le projet">
+        <delete includeEmptyDirs="true">
+            <fileset dir="${build.dir}" includes="**/*"/>
+            <fileset dir="${dist.dir}" includes="**/*"/>
+            <fileset dir="${doc.dir}" includes="**/*"/>
+        </delete>
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${doc.dir}" />
+    </target>
+
+    <!-- Compilation -->
+    <target name="compile" description="Compile le code source">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${doc.dir}" />
+        <path id="classpath">
+            <fileset dir="lib" includes="**/*.jar" />
+        </path>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="classpath"/>
+    </target>
+
+    <!-- build -->
+    <target name="build" depends="clean, jar, javadoc" description="Build le projet" />
+
+    <!-- Créer le JAR -->
+    <target name="jar" depends="compile" description="Crée le fichier JAR">
+    <mkdir dir="${dist.dir}" />
+    <jar destfile="${dist.dir}/MainClass.jar" basedir="${build.dir}">
+        <manifest>
+            <attribute name="Main-Class" value="MainClass" />
+        </manifest>
+        <zipgroupfileset dir="lib" includes="**/*.jar" />
+    </jar>
+    </target>
+
+    <!-- Créer le JAR analyse-->
+    <target name="jar-analyse" depends="compile" description="Crée le fichier JAR analyse">
+    <mkdir dir="${dist.dir}" />
+    <jar destfile="${dist.dir}/AnalyseMainClass.jar" basedir="${build.dir}">
+        <manifest>
+            <attribute name="Main-Class" value="AnalyseMainClass" />
+        </manifest>
+        <zipgroupfileset dir="lib" includes="**/*.jar" />
+    </jar>
+    </target>
+
+    <!-- Générer la Javadoc -->
+    <target name="javadoc" description="Génère la Javadoc">
+        <mkdir dir="${doc.dir}" />
+        <javadoc sourcepath="${src.dir}" destdir="${doc.dir}">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java" />
+            </fileset>
+            <classpath>
+                <fileset dir="lib" includes="*.jar"/>
+            </classpath>
+        </javadoc>
+    </target>
+
+    <!-- Exécuter vue-->
+	<target name="run" depends="jar" description="Exécute le JAR">
+	    <java jar="${dist.dir}/MainClass.jar" fork="true">
+		<classpath>
+		    <path location="${dist.dir}/MainClass.jar"/>
+		    <path refid="classpath"/>
+		</classpath>
+	    </java>
+	</target>
+
+    <!-- Exécuter analyse-->
+	<target name="run-analyse" depends="jar-analyse" description="Exécute le JAR analyse">
+	    <java jar="${dist.dir}/AnalyseMainClass.jar" fork="true">
+		<classpath>
+		    <path location="${dist.dir}/AnalyseMainClass.jar"/>
+		    <path refid="classpath"/>
+		</classpath>
+	    </java>
+	</target>
+
+    <!-- tests unitaires-->
+    <target name="run-tests" depends="clean, compile" description="Lancer les tests unitaires">
+        <java classname="tests.TestMain" fork="true">
+            <classpath>
+                <pathelement location="${build.dir}"/>
+                <fileset dir="lib" includes="*.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <!-- Affichage graphe general sur differentes listes-->
+    <target name="run-gstats">
+        <exec executable="python3">
+            <arg line="src/model/algorithms/statistics/readers/readersGeneral.py"/>
+        </exec>
+    </target>
+
+    <!-- Affichage graphe 1 algorithme sur differentes tailles de liste-->
+    <target name="run-stats">
+        <exec executable="python3">
+            <arg line="src/model/algorithms/statistics/readers/reader.py"/>
+        </exec>
+    </target>
+
+
+
+</project>

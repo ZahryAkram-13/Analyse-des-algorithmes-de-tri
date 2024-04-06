@@ -1,0 +1,17 @@
+unnamed package
+controller
+model
+model.algorithms
+model.algorithms.generators
+model.algorithms.sorts
+model.algorithms.sorts.mediator
+model.algorithms.statistics
+model.algorithms.statistics.writers
+model.algorithms.structures
+model.generators
+model.generators.concreteGenerators
+tests
+tests.model.generators
+tests.model.generators.concreteGenerators
+util
+view
